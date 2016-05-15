@@ -1,0 +1,379 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+
+
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-dialog/paper-dialog.html">
+<link rel="import" href="../paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../iron-selector/iron-selector.html">
+
+<!-- load default iconset -->
+<link rel="import" href="../iron-icons/iron-icons.html">
+
+<!-- load the rest -->
+<link rel="import" href="../iron-icons/av-icons.html">
+<link rel="import" href="../iron-icons/communication-icons.html">
+<link rel="import" href="../iron-icons/device-icons.html">
+<link rel="import" href="../iron-icons/editor-icons.html">
+<link rel="import" href="../iron-icons/hardware-icons.html">
+<link rel="import" href="../iron-icons/image-icons.html">
+<link rel="import" href="../iron-icons/maps-icons.html">
+<link rel="import" href="../iron-icons/notification-icons.html">
+<link rel="import" href="../iron-icons/social-icons.html">
+<link rel="import" href="../iron-icons/places-icons.html">
+
+<!--
+Icon selector input field with icon picker.
+Example:
+    <plutonium-icon-picker></plutonium-icon-picker>
+
+@demo demo/index.html
+@hero hero.svg
+-->
+
+<dom-module id="plutonium-icon-picker">
+    <template>
+        <style>
+            :host {
+                --main-color: red;
+                --minor-color: green;
+            }
+
+            :host .icon-picker-dialog {
+                /*@apply(--layout-vertical);*/
+            }
+
+            :host .bordered {
+                border-radius: 25px;
+                box-sizing: border-box;
+                background-color: #DDD;
+            }
+            :host .thumbnail {
+                --iron-icon-height: 24px;
+                --iron-icon-width: 24px;
+                height: 50px;
+                width: 50px;
+            }
+
+            :host .primary {
+                --iron-icon-fill-color: var(--main-color);
+                --iron-icon-stroke-color: var(--minor-color);
+            }
+            :host .secondary {
+                --iron-icon-fill-color: var(--minor-color);
+                --iron-icon-stroke-color: var(--main-color);
+            }
+
+            :host .set {
+                @apply(--layout-horizontal);
+                @apply(--layout-wrap);
+            }
+
+            :host .details {
+                height: 400px;
+                width: 300px;
+            }
+
+            .icon-container {
+                margin: 5px;
+                @apply(--layout-vertical);
+                @apply(--layout-center);
+            }
+
+
+            #container {
+                margin-top: 0px;
+                padding: 0px;
+                /*position:absolute;
+                left:0px;
+                top:0px;
+                right:0px;
+                bottom:0px;*/
+            }
+
+            /*            #preview {
+                            padding: 0px;
+                            position: relative;
+                        }*/
+
+            .landscapeOnly, .portraitOnly {
+                display:none;
+            }
+            #dialog {
+                display: flex;
+                align-items: stretch;
+            }
+
+            #detail {
+                min-width: 240px;
+                margin: 0px;
+                padding: 0px;
+            }
+
+            #title {
+                position: absolute;
+                text-align: left;
+                color: white;
+                @apply(--paper-font-common-base);
+                font-size: 28px;
+                font-weight: 400;
+                letter-spacing: -.01em;
+                line-height: 38px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                padding: 20px;
+                padding-bottom: 30px;
+            }
+            #preview {
+                margin-top: 0px;
+                background-image:
+                    linear-gradient(45deg, #eee 25%, transparent 25%),
+                    linear-gradient(45deg, transparent 75%, #eee 75%),
+                    linear-gradient(45deg, #eee 25%, transparent 25%),
+                    linear-gradient(45deg, transparent 75%, #eee 75%);
+                background-size:24px 24px;
+                background-position:0 0, 0px 0px, 12px 12px, 12px 12px;
+            }
+
+            .buttons{
+                margin-top:20px;
+                padding-left:0px;
+                padding-right:0px;
+            }
+            #color{
+                position: absolute;
+                left: 0px;
+                top: 0px;
+                right: 0px;
+                bottom: 0px;
+                z-index: 0;
+            }
+        </style>
+
+        <iron-meta type="iconset" list="{{iconsets}}"></iron-meta>
+
+
+        <paper-dialog id="dialog" 
+                      entry-animation="scale-up-animation"
+                      exit-animation="fade-out-animation"
+                      with-backdrop
+                      class="icon-picker-dialog">
+            <div>
+                <div class="icon-container">
+                    <h3>Main</h3>
+                    <iron-icon icon="{{icon}}" id="primary" class="primary preview thumbnail bordered"></iron-icon>
+                </div>
+                <div class="icon-container">
+                    <h3>Minor</h3>
+                    <iron-icon icon="{{icon}}" id="secondary" class="secondary preview thumbnail bordered"></iron-icon>
+                </div>
+            </div>
+            <!--<div id="detail" class="details">-->
+            <div id="details">
+                <paper-dialog-scrollable class="details">
+                    <iron-selector attr-for-selected="name" selected="{{icon}}" class="set">
+                        <template is="dom-repeat" items="{{iconsets}}">
+                            <template is="dom-repeat" items="{{getIconNames(item)}}">
+                                <div class="icon-container" name="{{item}}">
+                                    <iron-icon class="thumbnail bordered" icon="{{item}}"></iron-icon>
+                                    <!--<label>{{item}}</label>-->
+                                </div>
+                            </template>
+                        </template>
+                    </iron-selector>
+                </paper-dialog-scrollable>
+
+                <!--                        <template is="dom-if" if="{{_showValueSlider(shape, type)}}">
+                                            <paper-input-container attr-for-value="immediate-value">
+                                                <label>Value (Brightness)</label>
+                                                <paper-slider id="valueSlider" class="paper-input-input" min="0" max="100" pin="true" value="100" immediate-value="{{sliderValue}}"></paper-slider>
+                                            </paper-input-container>
+                                        </template>
+                                        <template is="dom-if" if="{{_showLightnessSlider(shape, type)}}">
+                                            <paper-input-container attr-for-value="immediate-value">
+                                                <label>Lightness</label>
+                                                <paper-slider id="lightnessSlider" class="paper-input-input" min="0" max="100" pin="true" value="50" immediate-value="{{sliderLightness}}"></paper-slider>
+                                            </paper-input-container>
+                                        </template>
+                                        <template is="dom-if" if="{{_showHuePicker(shape)}}">
+                                            <paper-input-container attr-for-value="id">
+                                                <label>Hue</label>
+                                                <canvas id="huePicker" class="paper-input-input" on-tap="huePickerPickColor" on-track="huePickerPickColor" width="360" height="1"></canvas>
+                                            </paper-input-container>
+                                            <paper-slider id="hueSlider" min="0" max="100" value="50" immediate-value="{{sliderHue}}"></paper-slider>
+                                        </template>
+                
+                                        <template is="dom-if" if="{{_and(allowAlpha,_initialAlphaValueHackApplied)}}">
+                                            <paper-input-container attr-for-value="immediate-value" hidden$="{{!_or(alwaysShowAlpha, advanced)}}">
+                                                                   <label>Alpha (transparency)</label>
+                                                <paper-slider id="alphaPicker" class="paper-input-input" min="0" max="1" step="0.01" value="{{_initialAlphaValueHack}}" immediate-value="{{immediateColor.alpha}}"></paper-slider>
+                                            </paper-input-container>
+                                        </template>
+                
+                                        <div hidden$="{{!advanced}}">
+                                             <div class="landscapeOnly">
+                                             <div id="rgb">
+                                                <paper-input id="redField" value="{{immediateColor.red}}" on-input="changeColorMixture" type="number" min="0" max="255" label="Red"></paper-input>
+                                                <paper-input id="greenField" value="{{immediateColor.green}}" on-input="changeColorMixture" type="number" min="0" max="255" label="Green"></paper-input>
+                                                <paper-input id="blueField" value="{{immediateColor.blue}}" on-input="changeColorMixture" type="number" min="0" max="255" label="Blue"></paper-input>
+                                            </div>
+                                            </div>
+                                        </div>-->
+                <!--</div>-->
+
+                <div class="buttons">
+                    <paper-button dialog-dismiss>Cancel</paper-button>
+                    <!--<paper-button on-tap="toggleAdvancedMode" hidden$="{{advanced}}">Advanced</paper-button>-->
+                    <paper-button dialog-confirm on-tap="setIcon">OK</paper-button>
+                </div>
+            </div>
+
+
+        </paper-dialog>
+    </template>
+    <script>
+        (function () {
+            'use strict';
+            Polymer({
+                is: 'plutonium-icon-picker',
+                behaviors: [
+                    Polymer.IronSelectableBehavior
+                ],
+                properties: {
+                    mainColor: {
+                        type: String,
+                        notify: true,
+                        observer: 'observeMainColor'
+                    },
+                    minorColor: {
+                        type: String,
+                        notify: true,
+                        observer: 'observeMinorColor'
+                    },
+                    /**
+                     * The selected color as an object: `{red, green, blue}`
+                     *
+                     * @attribute color
+                     * @type Object
+                     * @default new Object()
+                     */
+                    icon: {
+                        type: String,
+                        notify: true
+                    },
+                    colorLightness: {
+                        type: Number,
+                        value: 0.5
+                    },
+                    colorValue: {
+                        type: Number,
+                        value: 1
+                    },
+                    disableUpdate: {
+                        type: Boolean,
+                        value: false
+                    },
+                    /**
+                     * Show alpha slider always instead of only in the advanced settings
+                     */
+                    alwaysShowAlpha: Boolean,
+                    /**
+                     * Whether to allow changing the transparency of the picked color
+                     */
+                    allowAlpha: Boolean,
+                    /**
+                     * The selected color as an object: `{red, green, blue}`
+                     * even before the user clicks ok
+                     *
+                     * @attribute immediateColor
+                     * @type Object
+                     * @default {red: 50, green: 50, blue: 50}
+                     */
+                    immediateIcon: {
+                        type: String,
+                        notify: true
+                    },
+                    /**
+                     * *square*, *circle* or *huebox*
+                     *
+                     * @attribute shape
+                     * @type string
+                     * @default 'circle'
+                     */
+                    shape: {
+                        type: String,
+                        value: 'circle',
+                        notify: true
+                    },
+                    sliderHue: {
+                        type: Number,
+                        value: 50
+                    },
+                    sliderLightness: {
+                        type: Number,
+                        value: 50,
+//                            observer: 'sliderLightnessChanged'
+                    },
+                    sliderValue: {
+                        type: Number,
+                        value: 100,
+//                            observer: 'sliderValueChanged'
+                    },
+                    /**
+                     * *hsv* or *hsl*
+                     *
+                     * @attribute type
+                     * @type string
+                     * @default 'hsv'
+                     */
+                    type: {
+                        type: String,
+                        value: 'hsv',
+                        notify: true
+                    },
+                    noFullNames: {
+                        type: Boolean
+                    }
+                },
+                observers: [
+                    'immediateIconChanged(immediateIcon)'
+                ],
+                observeMainColor: function (mainColor) {
+                    this.customStyle['--main-color'] = mainColor;
+                    this.updateStyles();
+                },
+                observeMinorColor: function (minorColor) {
+                    this.customStyle['--minor-color'] = minorColor;
+                    this.updateStyles();
+                },
+                setIcon: function () {
+//                    this.set('icon', this.immediateIcon);
+                },
+                open: function () {
+                    if (this.icon)
+                        this.immediateIcon = this.icon;
+                    this.immediateIconChanged();
+                    this.$.dialog.open();
+//                        if (this._showHuePicker())
+//                            this.drawHuePicker();
+                },
+                immediateIconChanged: function () {
+
+                },
+                getIconNames: function (iconset) {
+                    return iconset.getIconNames();
+                }
+
+            });
+        })();
+    </script>
+</dom-module>
