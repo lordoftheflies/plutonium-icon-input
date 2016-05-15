@@ -1,6 +1,20 @@
 # plutonium-icon-input
 Icon selector input with icon picker dialog.
 
+## Usage
+
+### Install
+```bash
+bower install plutonium-icon-input
+```
+
+### Link
+<link rel="import" href="bower_components/plutonium-icon-input/plutonium-icon-input.html">
+
+### Use
+```html
+<plutonium-icon-input label="Icon input label" icon="create"></plutonium-icon-input>
+```
 
 ## Dependencies
 
