@@ -1,6 +1,8 @@
 # plutonium-icon-input
 Icon selector input with icon picker dialog.
 
+Based on [Polymer Seed Element](https://github.com/PolymerElements/seed-element)
+
 ## Usage
 
 ### Install
