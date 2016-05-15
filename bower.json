@@ -1,6 +1,6 @@
 {
   "name": "plutonium-icon-input",
-  "version": "1.0.7",
+  "version": "1.0.0",
   "authors": [
     "lordoftheflies <heglas11@gmail.com>"
   ],
@@ -8,7 +8,8 @@
   "keywords": [
     "web-component",
     "polymer",
-    "seed"
+    "plutonium",
+    "input"
   ],
   "main": "plutonium-icon-input.html",
   "license": "http://polymer.github.io/LICENSE.txt",
