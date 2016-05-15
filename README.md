@@ -1,6 +1,5 @@
-# seed-element
-
-An element providing a starting point for your own reusable Polymer elements.
+# plutonium-icon-input
+Icon selector input with icon picker dialog.
 
 
 ## Dependencies
