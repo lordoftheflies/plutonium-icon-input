@@ -1,0 +1,223 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-input/paper-input-container.html">
+<link rel="import" href="plutonium-icon-picker.html">
+
+<!--
+An element providing a solution to no problem in particular.
+Example:
+    <plutonium-icon-input></plutonium-icon-input>
+Example:
+    <plutonium-icon-input label="Test label" value="create">
+      
+    </plutonium-icon-input>
+@demo demo/index.html
+@hero hero.svg
+-->
+
+<dom-module id="plutonium-icon-input">
+    <template>
+        <style>
+            :host {
+            }
+            #colorPreview{
+                height: 16px;
+                width: 16px;
+                border: 1px solid rgba(0,0,0,.1);
+                border-radius: 1px;
+                margin: 2px;
+                position: relative;
+                background-image: linear-gradient(to right, #ffffff 1%,#ffffff 50%,#eee 50%,#eee 100%), linear-gradient(to right, #eee 1%,#eee 50%,#ffffff 50%,#ffffff 100%);
+                background-size: 16px 8px,  16px 8px;
+                background-repeat: repeat-x, repeat;
+            }
+            #color{
+                position: absolute;
+                left: 0px;
+                top: 0px;
+                right: 0px;
+                bottom: 0px;
+            }
+            #noColor{
+                width: 22.6px;
+                height: 1px;
+                border-top: 1px solid rgba(0,0,0,.1);
+                transform-origin: 0px 0px;
+                transform: translateY(15.5px) rotate(-45deg);
+            }
+            #input{
+                cursor: pointer;
+            }
+            span.dark{
+                font-size: 10px;
+                color: rgba(0,0,0,.8);
+                font-family: monospace;
+            }
+            span.light{
+                font-size: 10px;
+                font-family: monospace;
+                color: rgba(0,0,0,.3);
+            }
+        </style>
+        <paper-input-container id="input" always-float-label="{{_isValueDefined(value)}}">
+            <label>{{label}}</label>
+            <div class="paper-input-input">
+                <span>{{value}}</span>
+            </div>
+            <div id="iconPreview" suffix>
+                <iron-icon icon="{{value}}"></iron-icon>
+            </div>
+        </paper-input-container>
+
+        <plutonium-icon-picker 
+            id="picker" 
+            main-color="{{mainColor}}"
+            minor-color="{{minorColor}}"
+            icon="{{value}}" 
+            shape="{{shape}}" 
+            type="{{type}}" 
+            allow-alpha="{{allowAlpha}}" 
+            always-show-alpha="{{alwaysShowAlpha}}"
+            ></plutonium-icon-picker>
+
+    </template>
+
+    <script>
+        Polymer({
+            is: 'plutonium-icon-input',
+            properties: {
+                mainColor: {
+                    type: String,
+                    notify: true
+                },
+                minorColor: {
+                    type: String,
+                    notify: true
+                },
+                /**
+                 * The currently picked icon. This is a name string of the iron-icon.
+                 *
+                 * @attribute label
+                 * @type String
+                 * @default ''
+                 */
+                value: {
+                    type: String,
+                    notify: true
+                },
+                type: {
+                    type: String,
+                    notify: true
+                },
+                /**
+                 * The label for this input.
+                 *
+                 * @attribute label
+                 * @type String
+                 * @default ''
+                 */
+                label: {
+                    type: String,
+                    value: ''
+                },
+                /**
+                 * *square*, *circle* or *huebox*
+                 *
+                 * @attribute shape
+                 * @type string
+                 * @default 'circle'
+                 */
+                shape: {
+                    type: String,
+                    value: 'circle',
+                    notify: true
+                },
+                /**
+                 * Whether to allow changing the transparency of the picked color
+                 */
+                allowAlpha: Boolean,
+                /**
+                 * Whether to show the color also as a string
+                 */
+                withDescription: Boolean,
+                /**
+                 * Show alpha slider always instead of only in the advanced settings
+                 */
+                alwaysShowAlpha: Boolean,
+            },
+            behaviors: [
+                /* Polymer.IronFormElementBehavior */ // disabled till https://github.com/Polymer/polymer/issues/3167 gets fixed
+            ],
+            observers: [
+                '_setValueAsHexFromValue(value)'
+            ],
+            listeners: {
+                'input.tap': 'openPicker'
+            },
+            // Element Lifecycle
+            ready: function () {
+                if (this._isValueDefined()) {
+                    this.$.picker.set('immediateIcon', this.value);
+                    var listenOnce;
+                    this.$.picker.addEventListener('immediate-icon-as-string-changed', listenOnce = function () {
+                        //this.colorName = this.$.picker.immediateColorAsString;
+                        this.$.picker.setIcon();
+                        this.$.picker.removeEventListener('immediate-icon-as-string-changed', listenOnce);
+                    }.bind(this));
+                }
+            },
+            openPicker: function () {
+                this.$.picker.open();
+            },
+            _computeBackgroundColor: function () {
+                if (!this._isValueDefined()) {
+                    return 'background: white';
+                }
+                if (typeof this.value.alpha === 'undefined') {
+                    this.value.alpha = 1;
+                }
+                return 'background: rgba(' + this.value.red + ', ' + this.value.green + ',' + this.value.blue + ', ' + this.value.alpha + ')';
+            },
+            _isValueDefined: function () {
+                return this.value !== undefined && this.value !== null;
+            },
+            _setValueAsHexFromValue: function () {
+                if (this._isValueDefined()) {
+//                    var hex = '#';
+//                    var value = this.value;
+//                    ['red', 'green', 'blue'].forEach(function (c) {
+//                        var h = value[c].toString(16);
+//                        l = h.length;
+//                        hex += l < 2 ? '0' : '';
+//                        hex += l < 1 ? '0' : '';
+//                        hex += h;
+//                    });
+                    this.set('valueAsHex', this.value);
+                }
+            },
+            _setValueFromHex: function () {
+                var hex = this.valueAsHex;
+                var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+                var hex = hex.replace(shorthandRegex, function (m, r, g, b) {
+                    return r + r + g + g + b + b;
+                });
+                var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                if (typeof this.value === 'undefined') {
+                    this.set('value', {});
+                }
+                this.set('value.red', parseInt(result[1], 16));
+                this.set('value.green', parseInt(result[2], 16));
+                this.set('value.blue', parseInt(result[3], 16));
+            }
+        });
+    </script>       
+</dom-module>

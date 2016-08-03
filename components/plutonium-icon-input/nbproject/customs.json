@@ -1,0 +1,16 @@
+{
+    "elements": {
+        "template": {},
+        "dom-module": {},
+        "plutonium-icon-input": {
+            "attributes": {
+                "icon": {}
+            }
+        }
+    },
+    "attributes": {
+        "unresolved": {
+            "context": "body"
+        }
+    }
+}

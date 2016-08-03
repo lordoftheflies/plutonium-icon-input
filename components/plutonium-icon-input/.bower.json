@@ -1,0 +1,44 @@
+{
+  "name": "plutonium-icon-input",
+  "authors": [
+    "lordoftheflies <heglas11@gmail.com>"
+  ],
+  "description": "Icon selector input with icon picker dialog.",
+  "keywords": [
+    "web-component",
+    "polymer",
+    "plutonium",
+    "input"
+  ],
+  "main": "plutonium-icon-input.html",
+  "license": "http://polymer.github.io/LICENSE.txt",
+  "homepage": "https://github.com/lordoftheflies/plutonium-icon-input/",
+  "ignore": [
+    "/.*",
+    "/test/"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.2.0",
+    "iron-icon": "^1.0.8",
+    "iron-icons": "^1.1.3",
+    "paper-dialog": "^1.0.4",
+    "paper-input": "^1.1.11",
+    "iron-selector": "^1.5.1",
+    "paper-dialog-scrollable": "^1.1.4",
+    "paper-button": "^1.0.11"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "web-component-tester": "^4.0.0"
+  },
+  "_release": "f124f282eb",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "f124f282eb9b8dc0cc9689052abb321318422ec8"
+  },
+  "_source": "git://github.com/lordoftheflies/plutonium-icon-input.git",
+  "_target": "master",
+  "_originalSource": "lordoftheflies/plutonium-icon-input",
+  "_direct": true
+}
